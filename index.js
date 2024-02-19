@@ -43,9 +43,23 @@ async function run() {
    const taskCollection = client.db("task-manager").collection('tasks');
 
 
-   
 
 
+      app.post('/tasks',async(req,res)=>{
+        const newTasks=req.body;
+        // console.log(newTasks);
+        const result=await taskCollection.insertOne(newTasks);
+        res.send(result)
+
+      })
+
+      app.get('/tasks',async(req,res)=>{
+
+        const task=taskCollection.find(); 
+        const result=await task.toArray();
+
+        res.send(result);
+      })
 
 
 
