@@ -1,7 +1,7 @@
 const express=require('express')
 const app=express();
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId  } = require('mongodb');
 
 require('dotenv').config();
 const cors=require('cors');
@@ -59,6 +59,38 @@ async function run() {
         const result=await task.toArray();
 
         res.send(result);
+      })
+
+
+      // delete task 
+      app.delete('/task/:id',async(req,res)=>{ 
+        const getId=req.params.id; 
+        // console.log(getId); 
+        const query={_id :new ObjectId(getId)} 
+        const result=await taskCollection.deleteOne(query); 
+        res.send(result) 
+   
+      }) 
+
+
+      app.put('/task/:id',async(req,res)=>{
+        const id=req.params.id;//get id 
+        const filter={_id:new ObjectId(id)}//get specific data 
+        const options={upsert:true}//if data exist update otherwise create 
+        const updatedTask=req.body;//get data from client side 
+
+        console.log(id,updatedTask.status);
+         
+        // set data 
+        const task={ 
+          $set:{ 
+            status:updatedTask.status            
+          } 
+        } 
+
+
+        const result=await taskCollection.updateOne(filter,task,options) 
+        res.send(result); 
       })
 
 
