@@ -41,10 +41,35 @@ async function run() {
 
    //all collection
    const taskCollection = client.db("task-manager").collection('tasks');
+   const userCollection = client.db("task-manager").collection('users');
 
 
+ 
 
+   //user related api
+   app.post("/users", async (req, res) => {
+    const newUser = req.body;
+    //   console.log(newUser);
+    const query = { email: newUser.email };
+    const existingUser = await userCollection.findOne(query);
 
+    if (existingUser) {
+      return res.send({ message: "User already Exist" });
+    }
+    const result = await userCollection.insertOne(newUser);
+    res.send(result);
+  });
+   
+
+  app.get('/users',async(req,res)=>{
+    const user=userCollection.find(); 
+    const result=await user.toArray();
+    res.send(result);
+  })
+  
+    
+
+      //task related api
       app.post('/tasks',async(req,res)=>{
         const newTasks=req.body;
         // console.log(newTasks);
@@ -54,12 +79,11 @@ async function run() {
       })
 
       app.get('/tasks',async(req,res)=>{
-
         const task=taskCollection.find(); 
         const result=await task.toArray();
-
         res.send(result);
       })
+
 
 
       // delete task 
